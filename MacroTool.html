@@ -1,0 +1,397 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Text Transporter</title>
+  <style>
+    .master{
+      grid-template-areas: "textMech scriptRef ";
+      justify-content: center;
+    }
+    .menuItems{
+      margin: 0;
+      grid-column: 3 / span 2;
+      grid-column: 3 / span 2;
+      grid-column: 3 / span 2;
+    }
+    div > .menuItems{
+      background: lightgrey;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      text-align: center;
+    }
+    .textTrans{
+      grid-area: textTrans;
+      margin:0;
+      text-align: center;
+      background: DarkGoldenRod;
+    }
+    .scriptUse{
+      grid-area: scriptUse;
+      margin:0;
+      text-align: center;
+      background: DarkKhaki;
+    }
+    .helper{
+      grid-area: helper;
+      margin:0;
+      text-align: center;
+      background: MediumAquaMarine;
+
+    }
+    .menuContainer{
+      display: grid;
+      grid-template-columns: 1fr;
+      justify-content:end;
+    }
+    .textMech{
+      grid-area: textMech;
+      display: grid;
+
+      justify-content:start;
+      visibility: true;
+      background: aliceblue;
+
+    }
+    .mechContainer{
+      grid-column: 1 / span 2;
+    }
+
+    .header1{
+      align: center;
+      background: CornflowerBlue;
+      margin: auto;
+      padding:5px;
+      color:white;
+      width: 95%;
+      text-align: center;
+    }
+    .contentBox{
+      margin: auto;
+      width: 95%;
+      gap:0px;
+    }
+    .variableText{
+      margin: 0px;
+      width: 95%;
+      resize: none;
+      maxlength: 20;
+      align:center;
+    }
+    .variableText1{
+      margin: auto;
+      height: 50px;
+      width: 95%;
+      resize: none;
+      maxlength: 200;
+            align:center;
+    }
+    .textInputLG{
+      width: 95%;
+      height: 137px;
+      resize: none;
+      maxlength: 2000;
+    }
+    .textInput{
+      width: 95%;
+      height: 137px;
+      resize: none;
+      maxlength: 2000;
+    }
+    .textInput2{
+      width: 95%;
+      resize: none;
+      maxlength: 45;
+    }
+    .buttonGroup{
+      display: flex;
+    }
+    .scriptRef{
+      grid-area: scriptRef;
+
+    }
+    /*.helpWrapper{
+      grid-area: help;
+      display: grid;
+      justify-content:start;
+      background: aliceblue;
+      visibility: hidden;
+    }
+    .scriptWrapper{
+      display: grid;
+      grid-area: script;
+      justify-content:start;
+      background: aliceblue;
+      visibility: hidden;
+    }
+    .scriptContainer{
+      grid-column: 1 / span 2;
+      background: aliceblue;
+
+    }
+    .helpContainer{
+      grid-column: 1 / span 2;
+      background: aliceblue;
+
+    } */
+    .keyMap{
+      width: 95%;
+      resize: none;
+      maxlength: 50000;
+    }
+
+  </style>
+  <!-- callable function for removing special characters from a textarea -->
+  <script type="text/javascript">
+    var ESC_MAP = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    };
+
+    function escapeHTML(s, forAttribute) {
+        return s.replace(forAttribute ? /[&<>'"]/g : /[&<>]/g, function(c) {
+            return ESC_MAP[c];
+        });
+    }
+  </script>
+
+</head>
+
+<body>
+  <div class="master">
+
+    <!--
+    Menu container, that's being removed temporarily until I can figure out how to switch out divs without having the
+    screen expand likely, I'll need to do this with a server with templates, or using DOM to create and destroy the Divs.
+  <div class="menuContainer">
+    <div class="menuItems" onclick="textMech()">Text</div>
+    <div class="menuItems" onclick="scriptToggle()">Script</div>
+    <div class="menuItems" onclick="helpToggle()">Help</div>
+  </div> -->
+  <div class="textMech"  id="textMech">
+    <div class="mechContainer">
+    <form method="post">
+      <!-- Input box to be processed, contains original text that you want replaced and modified -->
+    <div class="header1">
+      <h3>Text Transporter</h3>
+      <p> Replacing variables you've matched, looking for specific words to be replaced, and applying commas to new lines</p>
+    </div>
+    <div class="contentBox">
+      <div id="variable" class="contentBox"><textarea id="var1" class="variableText" maxlength="20">value 1</textarea></div>
+      <div id="variable" class="contentBox"><textarea id="var2" class="variableText" maxlength="20">value 2</textarea></div>
+      <div id="variable" class="contentBox"><textarea id="var3" class="variableText" maxlength="20">value 3</textarea></div>
+      <div id="variable" class="contentBox"><textarea id="var4" class="variableText1" maxlength="500">value 4</textarea></div>
+    </div>
+    <div class="contentBox">
+      <textarea id="textinfo" class="textInputLG">
+please
+enter the
+information here
+      </textarea>
+
+<!-- This is the text you would like to find in your input and have replaced, and substituted with input from box below -->
+
+      <p> Enter the text to be matched </p>
+
+      <textarea id="terms" class="textInput2">
+      </textarea>
+
+      <p>Leave blank if you want to replace with a space </p>
+
+<!-- Takes the terms from the previous box and replaces them with whatever is in this box -->
+
+      <textarea id="terms-replace" class="textInput2"></textarea>
+
+      <p> This is the results area </p>
+
+<!-- Results Text Area will process the input, adding commas to new lines -->
+
+      <textarea id="results" class="textInput">
+Results will go here
+      </textarea>
+
+<!-- the button takes Text info from 'textinfo' textarea and runs a function
+that adds a comma before all the new lines, and puts it in the Results Textarea -->
+    </div>
+    <div class="buttonGroup">
+      <div>
+        <button type="button" onclick="findreplace_func()">Replace</button>
+      </div>
+      <div>
+        <input type="radio" id="comma" name="comma" value="">
+            <label for="comma">Comma</label>
+      </div>
+      <div>
+        <input type="radio" id="none" name="none" value="">
+            <label for="none">None</label>
+        <select id="caseType">
+            <option value="List1">List1</option>
+            <option value="List2">List2</option>
+      </select>
+      </div>
+    </div>
+  </form>
+
+  </div>
+</div>
+<div class="scriptRef" id="scriptRef">
+  <div class="scriptContainer">
+    <form method="post">
+      <p>Use this to map your inputs</p>
+      <textarea name="keyMap" id="keyMapper" class="keyMap"></textarea>
+      <p>Raw Script Container</p>
+      <textarea name="rawScript" id="rawScript" class="rawScript"></textarea>
+      <p>This uses the key map and raw script to categorize your scripts</p>
+      <textarea name="scriptCategory" id="scriptCategory" class="scriptCategory"></textarea>
+    </form>
+  </div>
+</div>
+<div class="helpWrapper" id="helpToggle">
+  <div class="helpContainer">
+    <form method="post">
+      <p>Use this to map your inputs</p>
+      <textarea name="keyMap" id="keyMapper" class="keyMap"></textarea>
+      <p>Raw Script Container</p>
+      <textarea name="rawScript" id="rawScript" class="rawScript"></textarea>
+      <p>This uses the key map and raw script to categorize your scripts</p>
+      <textarea name="scriptCategory" id="scriptCategory" class="scriptCategory"></textarea>
+    </form>
+  </div>
+</div>
+</div>
+<script>
+  var arr1 = [];
+  function addToList(){
+    function obj1(name, category, macro, id){
+      this.name = name;
+      this.category = category;
+      this.macro = macro;
+      this.id = id;
+    }
+    var z = 0; var s = 0; var t = 0; var y = 1;
+    var u = document.getElementById("input").value;
+    var p = [['&-','-&'],['!-','-!'],['%-','-%']];
+    var p2 = [/&-/g , /-&/g , /!-/g , /-!/g , /%-/g , /-%/g];
+    var h = [];
+    var r = [...u.matchAll(p2[t])];
+    var o_i; var o_n; var o_c; var o_m;
+    var m_o = [o_n, o_c, o_m, o_i];
+
+    function strObj(){
+      var n = [];
+      t = 0; y = 1; k = 0;
+      function funcR1(a,b){
+        var a; var b;
+        var c =[...u.matchAll(p2[a])];
+        return c[b].index;
+      }
+      for(i=0;i<r.length;i++){
+        var o = u.slice(funcR1(0,i),funcR1(5,i)+2);
+        h.push(o);
+        m_o[3]=i+1;
+        var k=0; var y=1;
+         for(t=0;t<(p2.length/2);t++){
+            var p = h[i].slice(funcR1(k,0)-1,funcR1(y,0)-3);
+            m_o[t] = p;
+            n.push(p);
+            k=k+2; y=y+2;
+            if (t == 3) { break; }
+          }
+
+        var arrayObject = new obj1(m_o[0], m_o[1], m_o[2], m_o[3]);
+        console.log(arrayObject);
+          }
+        }
+      strObj();
+      }
+var date = new Date();
+var h = new Date().getHours();
+var day;
+var tod;
+var mn = "Morning";
+var af = "Afternoon";
+var ev = "Evening";
+var reNewLine = new RegExp(/\n/g);
+if(h>=0){
+  tod = mn;
+  if(h>=12){
+    tod = af;
+    if(h>=16){
+      tod = ev;
+    };
+  };
+};
+switch (new Date().getDay()){
+  case 0:
+    day = "Sunday";
+    break;
+  case 1:
+    day = "Monday";
+    break;
+  case 2:
+    day = "Tuesday";
+    break;
+  case 3:
+    day = "Wednesday";
+    break;
+  case 4:
+    day = "Thursday";
+    break;
+  case 5:
+    day = "Friday";
+    break;
+  case  6:
+    day = "Saturday";
+};
+
+  console.log(day);
+  console.log(h);
+  console.log(tod);
+  var list = document.getElementById("caseType");
+  console.log(list);
+//document.getElementById("dayShow").innerHTML = "Today is " + day;
+  function textMech(){
+    document.getElementById('textMech').style.visibility='visible';
+    document.getElementById('scriptToggle').style.visibility='hidden';
+    document.getElementById('helpToggle').style.visibility='hidden';
+  }
+  function scriptToggle(){
+    document.getElementById('scriptToggle').style.visibility='visible';
+    document.getElementById('textMech').style.visibility='hidden';
+    document.getElementById('helpToggle').style.visibility='hidden';
+  }
+  function helpToggle(){
+    document.getElementById('helpToggle').style.visibility='visible';
+    document.getElementById('textMech').style.visibility='hidden';
+    document.getElementById('scriptToggle').style.visibility='hidden';
+
+  }
+  function findreplace_func(){
+	  document.getElementById("results").value = document.getElementById("textinfo").value.replace(new RegExp(document.getElementById("terms").value.toString(), 'g'), document.getElementById("terms-replace").value);
+
+    if (document.getElementById("comma").checked){
+      document.getElementById("results").value = document.getElementById("textinfo").value.replace(reNewLine, ',\n');
+      console.log("radio button clicked and creating new lines");
+		}else{
+		}
+    document.getElementById("results").value = document.getElementById("results").value.replace(new RegExp("TIMEOFDAY", 'g'), tod);
+    document.getElementById("results").value = document.getElementById("results").value.replace(new RegExp("DAY", 'g'), day);
+	  document.getElementById("results").value = document.getElementById("results").value.replace(new RegExp("AGENT", 'g'), document.getElementById("var1").value);
+	  document.getElementById("results").value = document.getElementById("results").value.replace(new RegExp("NAME", 'g'), document.getElementById("var2").value);
+	  document.getElementById("results").value = document.getElementById("results").value.replace(new RegExp("CASE", 'g'), document.getElementById("var3").value);
+  	document.getElementById("results").value = document.getElementById("results").value.replace(new RegExp("ISSUE", 'g'), document.getElementById("var4").value);
+    switch (document.getElementById("caseType").value){
+      case "List1": document.getElementById("results").value = document.getElementById("results").value.replace(new RegExp("TIER", 'g'), "Facebook Concierge Support");
+        console.log(list);
+        break;
+      case "List2": document.getElementById("results").value = document.getElementById("results").value.replace(new RegExp("TIER", 'g'), "Executive Services");
+        console.log(list);
+    }
+  }
+</script>
+
+</body>
+</html>
